@@ -86,8 +86,6 @@ public class mainFrame implements ActionListener {
                 fileGetter fg = new fileGetter();
                 try {
                     File f = fg.getFile("Select a JLINK file");
-                    //JLINKLibrary.JLINKSuperBox jlink = utils.shapeJLINKSuperBox(Files.readAllBytes(fg.getFile("Select a JLINK file (.jumbf)").toPath()));
-                    //utils.DisplayJlink(jlink);
 
                     JLINKSuperBox jlink = utils.shapeJLINKSuperBox(utils.getJUMBFUtils().getBoxesFromFile(f.getAbsolutePath()));
                     utils.analizeJPEGFile(f);

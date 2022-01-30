@@ -73,7 +73,7 @@ public class Builder implements ActionListener {
     }
     
     private void setJLINKDescriptionBoxFrame(String title, short BoxInstance) {
-        Values.setMap();
+        Common.Values.setMap();
         
         frame = new JFrame(title);
 
@@ -189,7 +189,7 @@ public class Builder implements ActionListener {
                 
             case "Continue":
                 try {
-                    jlink.setDescriptionBox(new JUMBFDescriptionBox(Values.TYPE_JLINK_Metadata_Elements, (byte) 0b00001111, tfLabel.getText(), Integer.parseInt(tfID.getText())));
+                    jlink.setDescriptionBox(new JUMBFDescriptionBox(Common.Values.TYPE_JLINK_Metadata_Elements, (byte) 0b00001111, tfLabel.getText(), Integer.parseInt(tfID.getText())));
                 } catch (Exception ex) {
                     Logger.getLogger(Builder.class.getName()).log(Level.SEVERE, null, ex);
                 }

@@ -7,7 +7,6 @@ import JUMBF.JUMBFSuperBox;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
@@ -56,7 +55,7 @@ public class descriptionBoxFrame implements ActionListener {
     }
     
     protected void setDescriptionFrame() throws Exception {
-        Values.setMap();
+        Common.Values.setMap();
         
         JButton b1 = new JButton("Continue");
         JButton baux = new JButton();
@@ -158,8 +157,23 @@ public class descriptionBoxFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         switch(e.getActionCommand()) {
             case "Continue":
+                byte toggle = (byte) 0b0000;
+                
+                if (Bit1.isSelected()) {
+                    toggle |= ((byte) 0b0001);
+                }
+                if (Bit2.isSelected()) {
+                    toggle |= ((byte) 0b0010);
+                }
+                if (Bit3.isSelected()) {
+                    toggle |= ((byte) 0b0100);
+                }
+                if (Bit4.isSelected()) {
+                    toggle |= ((byte) 0b1000);
+                }
+                
                 try {
-                    box = new JUMBFDescriptionBox(Values.BoxTypes.get(cb.getSelectedItem()), (byte) 0b1111, tfLabel.getText(), Integer.parseInt(tfID.getText()));    
+                    box = new JUMBFDescriptionBox(Common.Values.BoxTypes.get(cb.getSelectedItem()), toggle, tfLabel.getText(), Integer.parseInt(tfID.getText()));    
                 } catch (Exception ex) {
                     Logger.getLogger(descriptionBoxFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -168,7 +182,7 @@ public class descriptionBoxFrame implements ActionListener {
                 
                 fileGetter fg2 = new fileGetter();
                 File f2 = fg2.getFile("Select a CodeStream file");
-                System.out.println(box.getContentType().toString());
+
                 if (box.getContentType().toString().equalsIgnoreCase(Common.Values.String_TYPE_UUIDContentType)) {
                     System.out.println("UUID");
                     this.setUUIDFrame();

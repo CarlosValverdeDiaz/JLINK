@@ -5,17 +5,10 @@ import JUMBF.JUMBFDescriptionBox;
 import JUMBF.JUMBFSuperBox;
 import JUMBF.JUMBFUtils;
 import java.awt.Image;
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.UUID;
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -136,22 +129,20 @@ public class JLINKUtils {
             descriptionBox.setSignature(signature);
             offset += 32;
         }
+        
         jlink = new JLINKSuperBox(toggles, label.toString(), id, null);
-        //System.out.println("XML Length: " + this.JumbfUtils.getIntFromBytes(this.JumbfUtils.allocateBytes(data[offset], data[offset + 1], data[offset + 2], data[offset + 3])));
         baos.write(data, offset, this.JumbfUtils.getIntFromBytes(this.JumbfUtils.allocateBytes(data[offset], data[offset + 1], data[offset + 2], data[offset + 3])));
         xml = this.JumbfUtils.shapeJUMBFSuperBox(baos.toByteArray());
         jlink.setXMLContentBox(xml);
         offset += xml.getLBox()/2;
         baos.reset();
-        //System.out.println("Next Box Length: " + Integer.toHexString(this.JumbfUtils.getIntFromBytes(this.JumbfUtils.allocateBytes(data[offset], data[offset + 1], data[offset + 2], data[offset + 3]))));
+
         while (offset < jlinkLength - 20) {
             if(this.JumbfUtils.getIntFromBytes(this.JumbfUtils.allocateBytes(data[offset + 16], data[offset + 17], data[offset + 18], data[offset + 19])) == Common.Values.JUMBF_link) {
                 baos.write(data, offset, this.JumbfUtils.getIntFromBytes(this.JumbfUtils.allocateBytes(data[offset], data[offset + 1], data[offset + 2], data[offset + 3])));
                 offset += this.JumbfUtils.getIntFromBytes(this.JumbfUtils.allocateBytes(data[offset], data[offset + 1], data[offset + 2], data[offset + 3])) - 4;
                 jlink.addJLINK(this.shapeJLINKSuperBox(baos.toByteArray()));
             } else if (isJUMBFBox(this.JumbfUtils.getIntFromBytes(this.JumbfUtils.allocateBytes(data[offset + 4], data[offset + 5], data[offset + 6], data[offset + 7])))) {
-                //System.out.println(this.JumbfUtils.getIntFromBytes(this.JumbfUtils.allocateBytes(data[offset + 4], data[offset + 5], data[offset + 6], data[offset + 7])));
-                //System.out.println(this.JumbfUtils.getIntFromBytes(this.JumbfUtils.allocateBytes(data[offset + 16], data[offset + 17], data[offset + 18], data[offset + 19])));
                 baos.write(data, offset, this.JumbfUtils.getIntFromBytes(this.JumbfUtils.allocateBytes(data[offset], data[offset + 1], data[offset + 2], data[offset + 3])));
                 offset += this.JumbfUtils.getIntFromBytes(this.JumbfUtils.allocateBytes(data[offset], data[offset + 1], data[offset + 2], data[offset + 3])) - 4;
                 jlink.addJUMBFBox(JumbfUtils.shapeJUMBFSuperBox(baos.toByteArray()));
@@ -205,86 +196,33 @@ public class JLINKUtils {
         return BoxInstance;
     }
     
-    public SuperBox[] getBoxes(JLINKSuperBox box, short boxInstance) throws Exception {
-        long length = box.getXTBoxData().length;
-        int localSpan;
-        int offset = 0;
-        int numBoxes = 0;
-        boolean lastBox = false;
-                
-        SuperBox[] contentBoxes = null;
-        ByteArrayOutputStream contentBuilder = new ByteArrayOutputStream();
-            
-        if (length > Math.pow(2, 32)) {
-            //XLBox length
-            localSpan = Common.Values.XT_BOX_MAX_DATA - Common.Values.XT_BOX_HEADER_LENGTH - 1 - 8;
-            
-            while (length != 0) {
-                numBoxes++;
-                if (box.getXTBoxData().length < localSpan) {
-                    length = 0;
-                } else {
-                    length -= localSpan;
-                }
-            }
-            
-            contentBoxes = new SuperBox[numBoxes];
-            length = box.getXTBoxData().length;
-            
-            for (int i = 0; i < numBoxes; i++) {
-                if (i != numBoxes - 1) {
-                    contentBuilder.write(box.getXTBoxData(), offset, localSpan);
-                    contentBoxes[i] = new SuperBox((short) (Common.Values.XT_BOX_MAX_DATA - 1), boxInstance, i, 1, box.getType(), contentBuilder.toByteArray(), length);
-                    contentBuilder.reset();
-                    offset += localSpan;
-                } else {
-                    contentBuilder.write(box.getXTBoxData(), offset, (int) box.getXTBoxData().length);
-                    contentBoxes[i] = new SuperBox((short) (box.getXTBoxData().length - offset + Common.Values.XT_BOX_HEADER_LENGTH), boxInstance, i, 1, box.getType(), contentBuilder.toByteArray(), length);
-                    contentBuilder.reset();
-                }
-                
-            }
-            
-        } else {
-            //LBox length
-            localSpan = Common.Values.XT_BOX_MAX_DATA - Common.Values.XT_BOX_HEADER_LENGTH - 1;
-            while (!lastBox) {
-                numBoxes++;
-                if (length < localSpan) {
-                    lastBox = !lastBox;
-                } else {
-                    length -= localSpan;
-                }
-            }
-            
-            contentBoxes = new SuperBox[numBoxes];
-            length = box.getXTBoxData().length;
-            
-            for (int i = 0; i < numBoxes; i++) {
-                if (i < numBoxes - 1) {
-                    contentBuilder.write(box.getXTBoxData(), offset, localSpan);
-                    contentBoxes[i] = new SuperBox((short) (Common.Values.XT_BOX_MAX_DATA - 1), boxInstance, i, (int) length + 8, box.getType(), contentBuilder.toByteArray());
-                    contentBuilder.reset();
-                    offset += localSpan;
-
-                } else {
-                    contentBuilder.write(box.getXTBoxData(), offset, (int) box.getXTBoxData().length - offset);
-                    contentBoxes[i] = new SuperBox((short) (box.getXTBoxData().length - offset + Common.Values.XT_BOX_HEADER_LENGTH), boxInstance, i, (int) length + 8, box.getType(), contentBuilder.toByteArray());
-                    contentBuilder.reset();
-                }
-            }
-        }       
-        return contentBoxes;
-    }
-    
     public void analizeJPEGFile(File f) throws Exception {
         JFrame frame = new JFrame(f.getName());
         JLabel label = new JLabel();
-        ImageIcon icon = new ImageIcon(Files.readAllBytes(f.toPath()));
+        byte[] data = Files.readAllBytes(f.toPath());
+        ImageIcon image = new ImageIcon(data);
         
         this.DisplayJlink(this.shapeJLINKSuperBox(this.JumbfUtils.getBoxesFromFile(f.getAbsolutePath())));
         
-        label.setIcon(icon);
+        if (image.getIconHeight() > 900 || image.getIconWidth() > 1500) {
+            if (image.getIconWidth() > image.getIconHeight()) {
+                int width = 1500;
+                int height = image.getIconHeight()*width/image.getIconWidth();
+                Image aux = new ImageIcon(data).getImage();
+                Image scaled = aux.getScaledInstance(width, height , java.awt.Image.SCALE_SMOOTH);
+                label.setIcon(new ImageIcon(scaled));
+            } else {
+                int height = 900;
+                int width = image.getIconWidth()*height/image.getIconHeight();
+                Image aux = new ImageIcon(data).getImage();
+                Image scaled = aux.getScaledInstance(width, height , java.awt.Image.SCALE_SMOOTH);
+                label.setIcon(new ImageIcon(scaled));
+
+            }
+        } else {
+            label.setIcon(image);
+        }
+        
         frame.setVisible(true);
         frame.add(label);
         

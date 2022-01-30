@@ -2,8 +2,6 @@ package JLINKLibrary;
 
 import JUMBF.*;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.nio.file.Files;
 import java.util.HashMap;
 
 /**
@@ -101,9 +99,6 @@ public class JLINKSuperBox extends JUMBFSuperBox{
     
     public byte[] getXTBoxData() throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        //SuperBox Type
-//        baos.write(allocateData(this.getSize()));
-//        baos.write(allocateData(this.getType()));
         //DescriptionBox Type
         baos.write(allocateData(this.getDescriptionBox().getLBox()));
         baos.write(allocateData(this.getDescriptionBox().getType()));
@@ -119,7 +114,7 @@ public class JLINKSuperBox extends JUMBFSuperBox{
         baos.write(allocateData(this.getDescriptionBox().getId()));
         //Signature
         baos.write(allocateData(this.getDescriptionBox().getSignature()));
-        
+        //XML Box
         baos.write(allocateData(this.getXMLContentBox().getLBox()));
         baos.write(allocateData(this.getXMLContentBox().getType()));
         baos.write(this.getXMLContentBox().getXTBoxData());
@@ -135,9 +130,7 @@ public class JLINKSuperBox extends JUMBFSuperBox{
             baos.write(allocateData(jl.getType()));
             baos.write(jl.getXTBoxData());
         }
-        
-        //System.out.println(this.getDescriptionBox().getLabel() + ": " + baos.size());
-        
+                
         return baos.toByteArray();
     }
 }
