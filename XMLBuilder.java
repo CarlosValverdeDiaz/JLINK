@@ -6,14 +6,18 @@
 package JLINKBuilder;
 
 import JLINKLibrary.*;
+import JUMBF.JUMBFUtils;
 import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
@@ -43,8 +47,19 @@ public class XMLBuilder implements ActionListener {
     JTextField fileNameField;
     
     JLabel label0;
+    
+    Properties properties = new Properties();
+    private final String propertiesPath = "/home/carlos/NetBeansProjects/JUMBFLibrary/src/Common/";
+    String folderName;
 
     public XMLBuilder() {
+        try {
+            properties.load(new BufferedReader(new FileReader(propertiesPath + "Properties.properties")));
+        } catch (IOException ex) {
+            Logger.getLogger(JUMBFUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        folderName = properties.getProperty("TestFolderPath");
+        
         button0 = new JButton("Done");
         button0.setFocusable(false);
         button0.addActionListener(this);
@@ -846,7 +861,7 @@ public class XMLBuilder implements ActionListener {
                 }
                 System.out.println(this.fileName);
                 try {
-                    Files.write(Paths.get("/home/carlos/Testfiles/" + fileName + ".xsd"), baos.toByteArray());
+                    Files.write(Paths.get(folderName + fileName + ".xsd"), baos.toByteArray());
                 } catch (IOException ex) {
                     Logger.getLogger(XMLBuilder.class.getName()).log(Level.SEVERE, null, ex);
                 }

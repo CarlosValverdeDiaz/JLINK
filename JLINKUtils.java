@@ -174,7 +174,7 @@ public class JLINKUtils {
     }
     
     public short JLINKToBox(JLINKSuperBox superBox, String fileName, short BoxInstance) throws Exception {        
-        String s = new String("/home/carlos/Testfiles/" + fileName + ".jumbf");
+        String s = new String(this.JumbfUtils.folderName + fileName + ".jmb");
         File file = new File(s);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         
@@ -204,15 +204,15 @@ public class JLINKUtils {
         
         this.DisplayJlink(this.shapeJLINKSuperBox(this.JumbfUtils.getBoxesFromFile(f.getAbsolutePath())));
         
-        if (image.getIconHeight() > 900 || image.getIconWidth() > 1500) {
+        if (image.getIconHeight() > this.JumbfUtils.ImageMaxHeight || image.getIconWidth() > this.JumbfUtils.ImageMaxWidth) {
             if (image.getIconWidth() > image.getIconHeight()) {
-                int width = 1500;
+                int width = this.JumbfUtils.ImageWidth;
                 int height = image.getIconHeight()*width/image.getIconWidth();
                 Image aux = new ImageIcon(data).getImage();
                 Image scaled = aux.getScaledInstance(width, height , java.awt.Image.SCALE_SMOOTH);
                 label.setIcon(new ImageIcon(scaled));
             } else {
-                int height = 900;
+                int height = this.JumbfUtils.ImageHeight;
                 int width = image.getIconWidth()*height/image.getIconHeight();
                 Image aux = new ImageIcon(data).getImage();
                 Image scaled = aux.getScaledInstance(width, height , java.awt.Image.SCALE_SMOOTH);

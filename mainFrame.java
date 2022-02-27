@@ -19,14 +19,13 @@ import javax.swing.JPanel;
  */
 public class mainFrame implements ActionListener {
     JFrame frame = new JFrame();
-    
-    JPanel panel = new JPanel();
-    
+        
     JButton button1;
     JButton button2;
     JButton button3;
     JButton button4;
     JButton button5;
+    JButton aux;
     
     JLINKUtils utils = new JLINKUtils();
     
@@ -55,18 +54,27 @@ public class mainFrame implements ActionListener {
         button5.addActionListener(this);
         button5.setVisible(true);
         
-        panel.add(button1);
-        panel.add(button2);
-        panel.add(button3);
-        panel.add(button4);
-        panel.add(button5);
-        panel.setSize(600, 100);
+        aux = new JButton();
+        aux.setFocusable(false);
+        aux.addActionListener(this);
+        aux.setVisible(false);
+        
+        button1.setBounds(50, 200, 200, 150);
+        button2.setBounds(300, 200, 200, 150);
+        button3.setBounds(550, 200, 200, 150);
+        button4.setBounds(800, 200, 200, 150);
+        button5.setBounds(1050, 200, 200, 150);
+        
+        frame.add(button1);
+        frame.add(button2);
+        frame.add(button3);
+        frame.add(button4);
+        frame.add(button5);
+        frame.add(aux);
+        frame.setSize(1300, 600);
         
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(600,100);
         frame.setVisible(true);
-        
-        frame.add(panel);
     }
 
     @Override
